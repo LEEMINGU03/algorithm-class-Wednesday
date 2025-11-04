@@ -1,18 +1,20 @@
+
+# 단순 연결 리스트의 노드 정의
 class Node:
     def __init__(self, elem, next=None):
         self.data = elem
         self.link = next
-    def append(self, new):
+    def append(self, new): # 현재 노드 뒤 새 노드 삽입
         if new is not None:
             new.link = self.link
             self.link = new
-    def popNext(self):
+    def popNext(self): # 다음 노드 삭제 후 반환
         deleted_node = self.link
         if deleted_node is not None: self.link = deleted_node.link
         return deleted_node
     
 
-class Book:
+class Book: # 도서 정보 저장
     def __init__(self, bookID, title, author, year):
         self.bookID = bookID
         self.title = title
@@ -29,9 +31,9 @@ class LinkedList:
         return self.head == None
     
     def isFull(self):
-        return False  # 동적 노드 할당 
+        return False  
     
-    def getNode(self, pos):  # pos 기반 연산
+    def getNode(self, pos):  # pos번째 노드 반환
         if pos < 0: 
             return None 
         if self.head == None: 
@@ -44,14 +46,14 @@ class LinkedList:
                 ptr = ptr.link
             return ptr 
 
-    def getEntry(self, pos): 
+    def getEntry(self, pos): # pos 번째 노드 데이터 반환 
         node = self.getNode(pos)
         if node == None: 
             return None
         else:
             return node.data
 
-    def insert(self, pos, elem):
+    def insert(self, pos, elem): # pos 위치에 삽입
         if pos < 0:
             raise ValueError("잘못된 위치 값!")
         new = Node(elem)
@@ -66,7 +68,7 @@ class LinkedList:
         else:
             before.append(new)
 
-    def delete(self, pos):
+    def delete(self, pos): # pos 위치 삭제
         if pos < 0:
             raise ValueError("잘못된 위치 값!")
         before = self.getNode(pos-1)
@@ -81,7 +83,7 @@ class LinkedList:
         else:
             return before.popNext()
 
-    def size(self):
+    def size(self): # 전체 노드 개수 
         if self.head == None:
             return 0
         else:
@@ -103,7 +105,7 @@ class LinkedList:
             print("None")
 
 
-    def find_by_title(self, title):
+    def find_by_title(self, title): # 책 제목으로 도서 객체 검색
         ptr = self.head
         while ptr is not None:
             if ptr.data.title == title:
@@ -111,7 +113,7 @@ class LinkedList:
             ptr = ptr.link
         return None 
 
-    def find_pos_by_title(self, title):
+    def find_pos_by_title(self, title): # 책 제목으로 노드의 위치 반환 
         ptr = self.head
         pos = 0
         while ptr is not None:
@@ -121,11 +123,12 @@ class LinkedList:
             pos += 1
         return None
 
+# 도서 관리 클래스 
 class BookManagement:
     def __init__(self):
         self.book = LinkedList()
 
-    def doubble_bookID(self, book_id):
+    def doubble_bookID(self, book_id): # 책 번호 중복 확인
         ptr = self.book.head
         while ptr is not None:
             if ptr.data.bookID == book_id:
@@ -133,15 +136,20 @@ class BookManagement:
             ptr = ptr.link
         return False
     
-    def add_book(self, book_id, title, author, year):
-        if self.doubble_bookID(book_id):
-            print("이미 존재하는 책 번호 입니다")
-            return
+    def doubble_title(self,title): # 책 이름 중복 확인 
+        ptr = self.book.head
+        while ptr is not None:
+            if ptr.data.title == title:
+                return True
+            ptr = ptr.link
+        return False
+    
+    def add_book(self, book_id, title, author, year): # 도서 추가 
         pos = self.book.size()
         self.book.insert(pos,Book(book_id, title, author, year))
         print(f"도서 {title}가 추가되었습니다")
-    
-    def remove_book(self,title):
+     
+    def remove_book(self,title): #도서 삭제
         pos = self.book.find_pos_by_title(title)
         if pos is None:
             print("도서를 찾을 수 없습니다")
@@ -149,16 +157,16 @@ class BookManagement:
         deleted_Node = self.book.delete(pos)
         print(f"도서 {deleted_Node.data.title}가 삭제되었습니다")
 
-    def search_book(self,title):
+    def search_book(self,title): # 도서 조회
         book = self.book.find_by_title(title)
         if book is None:
             print("해당 도서를 찾을 수 없습니다")
             return
         print(f"[책 번호: {book.bookID}, 제목: {book.title}, 저자: {book.author}, 출판 연도: {book.year}]")
 
-    def display_books(self):
+    def display_books(self): # 전체 도서 목록 출력
         if self.book.isEmpty():
-            print("등록된 도서가 없습니다")
+            print("현재 등록된 도서가 없습니다")
             return
         print("현재 등록된 도서 목록:")
         ptr = self.book.head
@@ -179,13 +187,24 @@ class BookManagement:
             chose = input("메뉴를 선택하세요:")
             if chose == '1':
                 try:
-                    bookID = int(input("책 번호를 입력하세요: ").strip())
-                    title = input("책 제목을 입력하세요: ").strip()
+
+                    while True:
+                        bookID = int(input("책 번호를 입력하세요: ").strip())
+                        if self.doubble_bookID(bookID):
+                            print("이미 존재하는 책 번호입니다. 다시 입력하세요.")
+                        else:
+                            break
+                    while True:
+                        title = input("책 제목을 입력하세요: ").strip()
+                        if self.doubble_title(title):
+                            print("이미 존재하는 책입니다. 다시 입력하세요")
+                        else:
+                            break
                     author = input("저자를 입력하세요: ").strip()
                     year = int(input("출판 연도를 입력하세요: ").strip())
                     self.add_book(bookID,title,author,year)
                 except ValueError:
-                    print("다시 입력하세요.")
+                    print("도서 추가 실패하였습니다. 다시 입력하세요.")
             elif chose == '2':
                 title = input("삭제할 책 제목: ").strip()
                 self.remove_book(title)
