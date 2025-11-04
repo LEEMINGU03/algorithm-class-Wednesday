@@ -184,8 +184,8 @@ class BookManagement:
                     author = input("저자를 입력하세요: ").strip()
                     year = int(input("출판 연도를 입력하세요: ").strip())
                     self.add_book(bookID,title,author,year)
-                except:
-                    ValueError("다시 입력하세요")
+                except ValueError:
+                    print("다시 입력하세요.")
             elif chose == '2':
                 title = input("삭제할 책 제목: ").strip()
                 self.remove_book(title)
